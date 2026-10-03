@@ -1,51 +1,43 @@
 package com.jsburg.clash.registry;
 
 import com.jsburg.clash.Clash;
-import com.jsburg.clash.enchantments.MarkerEnchantment;
-import com.jsburg.clash.enchantments.axe.ButcheryEnchantment;
-import com.jsburg.clash.enchantments.axe.RampageEnchantment;
-import com.jsburg.clash.enchantments.axe.RetaliationEnchantment;
-import com.jsburg.clash.enchantments.greatblade.CrushingEnchantment;
-import com.jsburg.clash.enchantments.greatblade.ThrumEnchantment;
-import com.jsburg.clash.enchantments.greatblade.WhirlingEnchant;
-import com.jsburg.clash.enchantments.spear.DashEnchantment;
-import com.jsburg.clash.enchantments.spear.FlurryEnchantment;
-import com.jsburg.clash.enchantments.spear.JabEnchantment;
-import com.jsburg.clash.enchantments.spear.TipperEnchantment;
-import com.jsburg.clash.weapons.GreatbladeItem;
-import com.jsburg.clash.weapons.JumpRodItem;
-import com.jsburg.clash.weapons.SpearItem;
-import com.jsburg.clash.weapons.SweptAxeItem;
-import net.minecraft.world.entity.EquipmentSlot;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.Enchantment.Rarity;
-import net.minecraft.world.item.enchantment.EnchantmentCategory;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 
 public class AllEnchantments {
+    public static final int FLURRY_MAX_LEVEL = 3;
+    public static final float FLURRY_SPEED_PER_LEVEL = 0.2f;
 
-    public static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, Clash.MOD_ID);
+    public static final ResourceKey<Enchantment> FLURRY = key("flurry");
+    public static final ResourceKey<Enchantment> SWEET_SPOT = key("sweet_spot");
+    public static final ResourceKey<Enchantment> AGILITY = key("agility");
+    public static final ResourceKey<Enchantment> JAB = key("jab");
 
-    public static final EnchantmentCategory SPEAR = EnchantmentCategory.create("spear", item -> (item instanceof SpearItem));
-    public static final EnchantmentCategory SWEPT = EnchantmentCategory.create("swept", item -> (item instanceof SweptAxeItem));
-    public static final EnchantmentCategory GREATBLADE = EnchantmentCategory.create("greatblade", item -> (item instanceof GreatbladeItem));
-    public static final EnchantmentCategory AGILITY_ITEMS = EnchantmentCategory.create("agility", item -> (item instanceof SpearItem || item instanceof JumpRodItem));
+    public static final ResourceKey<Enchantment> BUTCHERY = key("butchery");
+    public static final ResourceKey<Enchantment> RAMPAGE = key("rampage");
+    public static final ResourceKey<Enchantment> RETALIATION = key("retaliation");
 
-    public static final RegistryObject<Enchantment> FLURRY = ENCHANTMENTS.register("flurry", () -> new FlurryEnchantment(Rarity.UNCOMMON, SPEAR, EquipmentSlot.MAINHAND));
-//    public static final RegistryObject<Enchantment> LUNGE = ENCHANTMENTS.register("lunge", () -> new ThrustEnchantment(Enchantment.Rarity.UNCOMMON, SPEAR, EquipmentSlotType.MAINHAND));
-    public static final RegistryObject<Enchantment> SWEET_SPOT = ENCHANTMENTS.register("sweet_spot", () -> new TipperEnchantment(Rarity.RARE, SPEAR, EquipmentSlot.MAINHAND));
-    public static final RegistryObject<Enchantment> AGILITY = ENCHANTMENTS.register("agility", () -> new DashEnchantment(Rarity.RARE, AGILITY_ITEMS, EquipmentSlot.MAINHAND));
-    public static final RegistryObject<Enchantment> JAB = ENCHANTMENTS.register("jab", () -> new JabEnchantment(Rarity.VERY_RARE, SPEAR, EquipmentSlot.MAINHAND));
+    public static final ResourceKey<Enchantment> SAILING = key("sailing");
+    public static final ResourceKey<Enchantment> CRUSHING = key("crushing");
+    public static final ResourceKey<Enchantment> EXECUTIONER = key("executioner");
+    public static final ResourceKey<Enchantment> THRUM = key("thrum");
+    public static final ResourceKey<Enchantment> WHIRLING = key("whirling");
 
-    public static final RegistryObject<Enchantment> BUTCHERY = ENCHANTMENTS.register("butchery", () -> new ButcheryEnchantment(Rarity.UNCOMMON, SWEPT, EquipmentSlot.MAINHAND));
-    public static final RegistryObject<Enchantment> RAMPAGE = ENCHANTMENTS.register("rampage", () -> new RampageEnchantment(Rarity.RARE, SWEPT, EquipmentSlot.MAINHAND));
-    public static final RegistryObject<Enchantment> RETALIATION = ENCHANTMENTS.register("retaliation", () -> new RetaliationEnchantment(Rarity.COMMON, SWEPT, EquipmentSlot.MAINHAND));
+    private static ResourceKey<Enchantment> key(String name) {
+        return ResourceKey.create(Registries.ENCHANTMENT, Clash.rl(name));
+    }
 
-    public static final RegistryObject<Enchantment> SAILING = ENCHANTMENTS.register("sailing", () -> new MarkerEnchantment(10, 30, Rarity.UNCOMMON, GREATBLADE, EquipmentSlot.MAINHAND));
-    public static final RegistryObject<Enchantment> CRUSHING = ENCHANTMENTS.register("crushing", () -> new CrushingEnchantment(Rarity.COMMON, GREATBLADE, EquipmentSlot.MAINHAND));
-    public static final RegistryObject<Enchantment> EXECUTIONER = ENCHANTMENTS.register("executioner", () -> new MarkerEnchantment(17, 50, Rarity.VERY_RARE, GREATBLADE, EquipmentSlot.MAINHAND));
-    public static final RegistryObject<Enchantment> THRUM = ENCHANTMENTS.register("thrum", () -> new ThrumEnchantment(Rarity.COMMON, GREATBLADE, EquipmentSlot.MAINHAND));
-    public static final RegistryObject<Enchantment> WHIRLING = ENCHANTMENTS.register("whirling", () -> new WhirlingEnchant(Rarity.COMMON, GREATBLADE, EquipmentSlot.MAINHAND));
+    public static int level(ItemStack stack, ResourceKey<Enchantment> enchantment) {
+        int found = 0;
+        for (Object2IntMap.Entry<Holder<Enchantment>> entry : stack.getEnchantments().entrySet()) {
+            if (entry.getKey().is(enchantment)) {
+                found = entry.getIntValue();
+            }
+        }
+        return found;
+    }
 }

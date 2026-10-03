@@ -7,9 +7,7 @@ import com.jsburg.clash.weapons.GreatbladeItem;
 import com.jsburg.clash.weapons.util.AttackHelper;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -24,6 +22,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -102,7 +101,7 @@ public class GreatbladeSlashEntity extends Entity {
             //Movement
             Vec3 nextPos = position().add(motion);
             BlockHitResult raytrace = level().clip(
-                    new ClipContext(centerPos, nextPos.add(0, yOff, 0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
+                    new ClipContext(centerPos, nextPos.add(0, yOff, 0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
             if (raytrace.getType() == HitResult.Type.MISS) {
                 this.moveTo(nextPos);
             }
@@ -148,7 +147,7 @@ public class GreatbladeSlashEntity extends Entity {
 
                     //Damage entity
                     float lastHealth = (livingentity).getHealth();
-                    if (livingentity.hurt(damageSource, damage + AttackHelper.getBonusEnchantmentDamage(swordStack, livingentity))) {
+                    if (livingentity.hurt(damageSource, damage + AttackHelper.getBonusEnchantmentDamage(swordStack, livingentity, owner))) {
                         float healthDifference = lastHealth - (livingentity).getHealth();
 
                         //player.addStat(Stats.DAMAGE_DEALT, Math.round(healthDifference * 10));
@@ -184,8 +183,7 @@ public class GreatbladeSlashEntity extends Entity {
 
     //Entity data stuff
     @Override
-    protected void defineSynchedData() {
-
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
     }
 
     @Override
@@ -211,9 +209,4 @@ public class GreatbladeSlashEntity extends Entity {
 
     }
 
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        Entity entity = this.getOwner();
-        return new ClientboundAddEntityPacket(this, entity == null ? 0 : entity.getId());
-    }
 }

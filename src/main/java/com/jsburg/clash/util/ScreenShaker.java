@@ -1,8 +1,7 @@
 package com.jsburg.clash.util;
 
 import com.jsburg.clash.registry.Config;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.client.event.ViewportEvent;
+import net.neoforged.neoforge.client.event.ViewportEvent;
 
 import java.util.Random;
 
@@ -18,8 +17,6 @@ public class ScreenShaker {
     private static int    ShakeTime = 0;
     private static double Intensity = 0;
 //    private static int    XFlip = -1;
-
-    private static final Minecraft mc = Minecraft.getInstance();
 
     public static void tick() {
         if (ShakeTime >= 1) {

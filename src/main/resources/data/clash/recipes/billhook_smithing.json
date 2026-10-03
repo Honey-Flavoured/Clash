@@ -7,7 +7,7 @@
     "item": "minecraft:tripwire_hook"
   },
   "result": {
-    "item": "clash:billhook"
+    "id": "clash:billhook"
   },
   "template": {
     "item": "minecraft:tripwire_hook"

@@ -8,21 +8,18 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class BillhookItem extends SpearItem {
-
     public BillhookItem(int attackDamage, float attackSpeed, Properties properties) {
         super(attackDamage, attackSpeed, properties);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        super.appendHoverText(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltip, flag);
         MutableComponent text = Component.literal(" ");
         text.append(Component.translatable("item.clash.billhook.inverted_knockback"));
         tooltip.add(text.withStyle(ChatFormatting.DARK_GREEN));
@@ -30,14 +27,12 @@ public class BillhookItem extends SpearItem {
 
     @Override
     public int getMinCharge(ItemStack stack) {
-        int spearMin = super.getMinCharge(stack);
-        return Math.max(spearMin - 2, 0);
+        return Math.max(super.getMinCharge(stack) - 2, 0);
     }
 
     @Override
     public int getMaxCharge(ItemStack stack) {
-        int spearMax = super.getMaxCharge(stack);
-        return Math.max(spearMax - 5, 3);
+        return Math.max(super.getMaxCharge(stack) - 5, 3);
     }
 
     @Override
@@ -48,10 +43,5 @@ public class BillhookItem extends SpearItem {
         Vec3 newMotion = new Vec3(diff.x(), 0, diff.z());
         newMotion = newMotion.normalize().scale(new Vec3(motion.x(), 0, motion.z()).length());
         target.setDeltaMovement(newMotion.x(), motion.y(), newMotion.z());
-    }
-
-    @Override
-    protected boolean canStabCrit(ItemStack stack) {
-        return super.canStabCrit(stack);
     }
 }

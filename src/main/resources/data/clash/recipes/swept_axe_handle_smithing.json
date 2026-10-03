@@ -7,7 +7,7 @@
     "item": "minecraft:stick"
   },
   "result": {
-    "item": "clash:swept_axe"
+    "id": "clash:swept_axe"
   },
   "template": {
     "item": "minecraft:string"

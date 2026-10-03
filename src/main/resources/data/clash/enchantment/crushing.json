@@ -1,0 +1,23 @@
+{
+  "description": {
+    "translate": "enchantment.clash.crushing"
+  },
+  "supported_items": "#clash:enchantable/greatblade",
+  "weight": 10,
+  "max_level": 2,
+  "min_cost": {
+    "base": 0,
+    "per_level_above_first": 10
+  },
+  "max_cost": {
+    "base": 15,
+    "per_level_above_first": 10
+  },
+  "anvil_cost": 1,
+  "slots": [
+    "mainhand"
+  ],
+  "exclusive_set": [
+    "clash:thrum"
+  ]
+}

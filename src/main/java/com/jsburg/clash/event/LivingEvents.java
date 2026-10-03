@@ -17,30 +17,24 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
-
-@Mod.EventBusSubscriber(modid = Clash.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = Clash.MOD_ID)
 public class LivingEvents {
-
-    //Referenced from Occultism's Butcher's Knife
     @SubscribeEvent
     public static void onLivingDrops(LivingDropsEvent event) {
         if (event.isRecentlyHit() && wasMeleeCaused(event.getSource())) {
             LivingEntity source = (LivingEntity) event.getSource().getEntity();
             LivingEntity target = event.getEntity();
 
-            //Check for Butchery drops
             ItemStack weapon = source.getMainHandItem();
-            int butcherLevel = EnchantmentHelper.getItemEnchantmentLevel(AllEnchantments.BUTCHERY.get(), weapon);
-            if (butcherLevel > 0 && ButcheryEnchantment.affectsEntity(target) && (weapon.getItem() != AllItems.SWEPT_AXE_HEAD.get())) {
-                //Spawn bonus Pork Chops
+            int butcherLevel = AllEnchantments.level(weapon, AllEnchantments.BUTCHERY);
+            if (butcherLevel > 0 && ButcheryEnchantment.affectsEntity(target) && weapon.getItem() != AllItems.SWEPT_AXE_HEAD.get()) {
                 RandomSource random = target.getCommandSenderWorld().getRandom();
                 int porkCount = ButcheryEnchantment.getPorkAmount(butcherLevel, random);
                 if (porkCount > 0) {
@@ -60,32 +54,27 @@ public class LivingEvents {
     }
 
     @SubscribeEvent
-    public static void onEntityHurt(LivingHurtEvent event) {
-        //CHECK FOR MELEE ATTACKS
+    public static void onEntityHurt(LivingIncomingDamageEvent event) {
         if (wasMeleeCaused(event.getSource())) {
             LivingEntity source = (LivingEntity) event.getSource().getEntity();
             LivingEntity target = event.getEntity();
 
             ItemStack weapon = source.getMainHandItem();
-            //Butchery Effect
-            int butcherLevel = EnchantmentHelper.getItemEnchantmentLevel(AllEnchantments.BUTCHERY.get(), weapon);
-            if (butcherLevel > 0 && ButcheryEnchantment.affectsEntity(target) && (weapon.getItem() != AllItems.SWEPT_AXE_HEAD.get())) {
+            int butcherLevel = AllEnchantments.level(weapon, AllEnchantments.BUTCHERY);
+            if (butcherLevel > 0 && ButcheryEnchantment.affectsEntity(target) && weapon.getItem() != AllItems.SWEPT_AXE_HEAD.get()) {
                 event.setAmount(event.getAmount() * ButcheryEnchantment.getDamageMultiplier(butcherLevel));
                 ButcheryEnchantment.onHit(butcherLevel, target);
             }
         }
-        //PLAYER GETTING HURT
         if (event.getEntity() instanceof Player hurtPlayer) {
             ItemStack heldItem = hurtPlayer.getMainHandItem();
-
-            //Retaliation effect
-            if (EnchantmentHelper.getItemEnchantmentLevel(AllEnchantments.RETALIATION.get(), heldItem) > 0) {
-                RetaliationEnchantment.onUserHurt(hurtPlayer, EnchantmentHelper.getItemEnchantmentLevel(AllEnchantments.RETALIATION.get(), heldItem));
+            int retaliation = AllEnchantments.level(heldItem, AllEnchantments.RETALIATION);
+            if (retaliation > 0) {
+                RetaliationEnchantment.onUserHurt(hurtPlayer, retaliation);
             }
         }
-        //Remove stagger upon being hurt
-        if (event.getEntity().getEffect(AllEffects.STAGGERED.get()) != null) {
-            event.getEntity().removeEffect(AllEffects.STAGGERED.get());
+        if (event.getEntity().getEffect(AllEffects.STAGGERED) != null) {
+            event.getEntity().removeEffect(AllEffects.STAGGERED);
         }
     }
 
@@ -93,10 +82,8 @@ public class LivingEvents {
     public static void onEntityKill(LivingDeathEvent event) {
         if (wasMeleeCaused(event.getSource())) {
             LivingEntity source = (LivingEntity) event.getSource().getEntity();
-            LivingEntity target = event.getEntity();
-
             ItemStack weapon = source.getMainHandItem();
-            int rampageLevel = EnchantmentHelper.getItemEnchantmentLevel(AllEnchantments.RAMPAGE.get(), weapon);
+            int rampageLevel = AllEnchantments.level(weapon, AllEnchantments.RAMPAGE);
             if (rampageLevel > 0) {
                 RampageEnchantment.onKill(source, rampageLevel);
             }
@@ -104,10 +91,6 @@ public class LivingEvents {
     }
 
     private static boolean wasMeleeCaused(DamageSource source) {
-        return (source.getEntity() instanceof LivingEntity && isMeleeDamage(source));
-    }
-
-    private static boolean isMeleeDamage(DamageSource source) {
-        return source.getDirectEntity() == source.getEntity();
+        return source.getEntity() instanceof LivingEntity && source.getDirectEntity() == source.getEntity();
     }
 }

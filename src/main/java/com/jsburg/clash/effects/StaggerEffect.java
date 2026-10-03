@@ -12,21 +12,22 @@ public class StaggerEffect extends MobEffect {
     }
 
     @Override
-    public void applyEffectTick(LivingEntity entityLivingBaseIn, int amplifier) {
-        if (entityLivingBaseIn.onGround()) {
-            Vec3 motion = entityLivingBaseIn.getDeltaMovement();
-            Vec3 look = MiscHelper.extractHorizontal(entityLivingBaseIn.getViewVector(1)).scale(-1);
-            float movespeed = entityLivingBaseIn.getSpeed();
-            float speed = (movespeed)/(1 + amplifier);
-            double dot = (motion.dot(look));
-            if ((dot) < speed) {
-                entityLivingBaseIn.setDeltaMovement(motion.add(look.scale(speed - dot)));
+    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
+        if (entity.onGround()) {
+            Vec3 motion = entity.getDeltaMovement();
+            Vec3 look = MiscHelper.extractHorizontal(entity.getViewVector(1)).scale(-1);
+            float movespeed = entity.getSpeed();
+            float speed = movespeed / (1 + amplifier);
+            double dot = motion.dot(look);
+            if (dot < speed) {
+                entity.setDeltaMovement(motion.add(look.scale(speed - dot)));
             }
         }
+        return true;
     }
 
     @Override
-    public boolean isDurationEffectTick(int duration, int amplifier) {
+    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
         return true;
     }
 }

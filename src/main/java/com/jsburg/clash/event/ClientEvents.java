@@ -5,17 +5,20 @@ import com.jsburg.clash.util.ItemAnimator;
 import com.jsburg.clash.util.ScreenShaker;
 import com.jsburg.clash.weapons.GreatbladeItem;
 import com.jsburg.clash.weapons.SweptAxeItem;
+import com.jsburg.clash.Clash;
 import com.jsburg.clash.weapons.util.ISpearAnimation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
-import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderHandEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
@@ -25,23 +28,25 @@ import static com.jsburg.clash.weapons.GreatbladeItem.hasExecutioner;
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 
+@EventBusSubscriber(modid = Clash.MOD_ID, value = Dist.CLIENT)
 public class ClientEvents {
 
     private static boolean needsPop = false;
 
-    //All the events below this are set up with listeners in Client setup
-
+    @SubscribeEvent
     public static void doClientTick(ClientTickEvent.Pre event) {
         ScreenShaker.tick();
         ItemAnimator.tick();
     }
 
+    @SubscribeEvent
     public static void doCameraStuff(ViewportEvent.ComputeCameraAngles event) {
         ScreenShaker.applyScreenShake(event.getPartialTick(), event);
         //Just resetting this between frames because if execution order *does* get weird I don't want stuff carrying over
         needsPop = false;
     }
 
+    @SubscribeEvent
     public static void fiddleWithHands(RenderHandEvent event) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
@@ -84,7 +89,7 @@ public class ClientEvents {
                 Item spear = event.getItemStack().getItem();
                 ISpearAnimation chargeGetter = (ISpearAnimation) spear;
                 int useCount = player.getUseItemRemainingTicks();
-                int useDuration = spear.getUseDuration(event.getItemStack());
+                int useDuration = spear.getUseDuration(event.getItemStack(), player);
                 int useTime = useDuration - useCount;
                 float chargePercent = Math.min((useTime + event.getPartialTick()) / chargeGetter.getMaxCharge(event.getItemStack()), 1);
 
@@ -142,7 +147,7 @@ public class ClientEvents {
             if (greatbladeDraw) {
                 GreatbladeItem sword = (GreatbladeItem) event.getItemStack().getItem();
                 int useCount = player.getUseItemRemainingTicks();
-                int useDuration = sword.getUseDuration(event.getItemStack());
+                int useDuration = sword.getUseDuration(event.getItemStack(), player);
                 int useTime = useDuration - useCount;
                 float chargePercent = Math.min((useTime + event.getPartialTick()) / (sword.getMaxCharge() + 1), 1);
 

@@ -1,9 +1,13 @@
 package com.jsburg.clash.registry;
 
 import com.jsburg.clash.Clash;
-import com.jsburg.clash.particle.*;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.ParticleEngine;
+import com.jsburg.clash.particle.AxeSweepParticle;
+import com.jsburg.clash.particle.ButcherSparkEmitter;
+import com.jsburg.clash.particle.ClashSpriteParticle;
+import com.jsburg.clash.particle.DashDustParticle;
+import com.jsburg.clash.particle.ScreenShakerParticle;
+import com.jsburg.clash.particle.SpearCritParticle;
+import com.jsburg.clash.particle.SpearStabParticle;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
@@ -12,7 +16,6 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class AllParticles {
-
     public static final DeferredRegister<ParticleType<?>> PARTICLE_TYPES = DeferredRegister.create(Registries.PARTICLE_TYPE, Clash.MOD_ID);
 
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> SPEAR_STAB = register("spear_stab");
@@ -29,9 +32,7 @@ public class AllParticles {
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> SAILING_TRAIL = register("sailing_trail");
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> GREATBLADE_SLASH = register("greatblade_slash_2");
 
-    //Registered in Clash Client Setup
     public static void registerParticleFactories(RegisterParticleProvidersEvent event) {
-        ParticleEngine manager = Minecraft.getInstance().particleEngine;
         event.registerSpriteSet(SPEAR_STAB.get(), SpearStabParticle.Factory::new);
         event.registerSpriteSet(SPEAR_CRIT.get(), SpearCritParticle.Factory::new);
         event.registerSpriteSet(DASH_DUST.get(), DashDustParticle.Factory::new);
@@ -54,7 +55,4 @@ public class AllParticles {
     private static DeferredHolder<ParticleType<?>, SimpleParticleType> register(String name, boolean alwaysShow) {
         return PARTICLE_TYPES.register(name, () -> new SimpleParticleType(alwaysShow));
     }
-
-
-
 }

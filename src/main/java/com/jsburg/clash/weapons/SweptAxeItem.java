@@ -15,70 +15,35 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.DamageEnchantment;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class SweptAxeItem extends WeaponItem {
-
     public SweptAxeItem(int attackDamage, float attackSpeed, Properties properties) {
         super(attackDamage, attackSpeed, properties);
     }
 
     @Override
-    public List<Enchantment> vanillaEnchantments() {
-        return Arrays.asList(Enchantments.MOB_LOOTING);
-    }
-
-    @Override
-    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        if (enchantment instanceof DamageEnchantment) return true;
-        return super.canApplyAtEnchantingTable(stack, enchantment);
-    }
-
-    @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity target) {
         if (AttackHelper.weaponIsCharged(player)) {
-
-            //Sweep Particle
-            MobEffectInstance retaliation = player.getEffect(AllEffects.RETALIATION.get());
+            MobEffectInstance retaliation = player.getEffect(AllEffects.RETALIATION);
             Vec3 eyepos = player.position().add(0, player.getEyeHeight(), 0);
             AttackHelper.makeParticle(target.level(), AllParticles.AXE_SWEEP.get(),
                     target.position().add(eyepos).scale(.5),
-                    //Axe sweep particle uses xSpeed as scale, ySpeed as being red, zSpeed is horizontal flip
-                    .5, (retaliation != null) ? 1 : 0, player.getMainArm() == HumanoidArm.LEFT ? 1 : 0
+                    .5, retaliation != null ? 1 : 0, player.getMainArm() == HumanoidArm.LEFT ? 1 : 0
             );
 
-//            if (player.world.isRemote) {
-//                Random rand = player.world.getRandom();
-//                AxisAlignedBB bb = target.getBoundingBox();
-//                double l = bb.getAverageEdgeLength();
-//                Vector3d pos = new Vector3d((rand.nextDouble() - .5) * l, rand.nextDouble() * l + .5, (rand.nextDouble() - .5) * l);
-//                AttackHelper.makeParticle(player.world, AllParticles.BUTCHER_SPARK_EMITTER.get(), target.getPositionVec().add(pos));
-//            }
-
-            //Used for knockback
             Vec3 look = player.getLookAngle();
-            //Calculate damage dealt
             float damage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE);
             int hits = 1;
 
-            //Get entities to sweep, almost directly copied from sword sweeping code.
-            for(LivingEntity livingentity : player.level().getEntitiesOfClass(LivingEntity.class, target.getBoundingBox().inflate(1.5D, 0.5D, 1.5D))) {
-                if (livingentity != player && livingentity != target && !player.isAlliedTo(livingentity) && (!(livingentity instanceof ArmorStand) || !((ArmorStand) livingentity).isMarker()) && player.distanceToSqr(livingentity) < 12.0D) {
-                    //Skip over pets tamed by the player
-                    if (livingentity instanceof TamableAnimal) {
-                        if (((TamableAnimal) livingentity).isOwnedBy(player)) {
-                            continue;
-                        }
+            for (LivingEntity livingentity : player.level().getEntitiesOfClass(LivingEntity.class, target.getBoundingBox().inflate(1.5D, 0.5D, 1.5D))) {
+                if (livingentity != player && livingentity != target && !player.isAlliedTo(livingentity) && (!(livingentity instanceof ArmorStand stand) || !stand.isMarker()) && player.distanceToSqr(livingentity) < 12.0D) {
+                    if (livingentity instanceof TamableAnimal pet && pet.isOwnedBy(player)) {
+                        continue;
                     }
                     if (!player.level().isClientSide) {
                         livingentity.knockback(0.4f, -look.x(), -look.z());
-                        float bonus = AttackHelper.getBonusEnchantmentDamage(stack, livingentity);
+                        float bonus = AttackHelper.getBonusEnchantmentDamage(stack, livingentity, player);
                         if (livingentity.hurt(player.level().damageSources().playerAttack(player), damage + bonus)) {
                             if (bonus > 0) {
                                 player.magicCrit(livingentity);
@@ -93,11 +58,8 @@ public class SweptAxeItem extends WeaponItem {
                 ScreenShaker.setScreenShake(4, 2);
             }
 
-
-            //Sweep Sound
             AttackHelper.playSound(player, SoundEvents.PLAYER_ATTACK_SWEEP, 1.0f, .7f);
         }
         return false;
     }
-
 }

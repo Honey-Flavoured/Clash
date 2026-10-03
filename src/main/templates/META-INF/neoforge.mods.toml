@@ -4,12 +4,10 @@ license="${mod_license}"
 issueTrackerURL="https://github.com/jsburger/Clash/issues"
 [[mods]]
     modId="${mod_id}"
-    namespace="${mod_id}"
     version="${mod_version}"
     displayName="Clash!"
     authors="${mod_authors}"
     description='''${mod_description}'''
-    displayURL=""
 [[mixins]]
     config="${mod_id}.mixins.json"
 [[dependencies.${mod_id}]]

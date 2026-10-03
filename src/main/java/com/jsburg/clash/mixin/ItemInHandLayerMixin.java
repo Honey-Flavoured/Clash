@@ -1,6 +1,6 @@
 package com.jsburg.clash.mixin;
 
-import com.jsburg.clash.weapons.util.IThirdPersonRenderHook;
+import com.jsburg.clash.client.ThirdPersonPoses;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.ArmedModel;
 import net.minecraft.client.model.EntityModel;
@@ -19,9 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemInHandLayer.class)
 public abstract class ItemInHandLayerMixin<T extends LivingEntity, M extends EntityModel<T> & ArmedModel> extends RenderLayer<T, M> {
-
-    public ItemInHandLayerMixin(RenderLayerParent<T, M> a) {
-        super(a);
+    public ItemInHandLayerMixin(RenderLayerParent<T, M> parent) {
+        super(parent);
     }
 
     @Inject(method = "renderArmWithItem",
@@ -31,11 +30,8 @@ public abstract class ItemInHandLayerMixin<T extends LivingEntity, M extends Ent
             ),
             cancellable = true)
     public void clashOnRenderArmItem(LivingEntity entity, ItemStack itemStack, ItemDisplayContext context, HumanoidArm arm, PoseStack poseStack, MultiBufferSource renderBuffer, int light, CallbackInfo ci) {
-        if (itemStack.getItem() instanceof IThirdPersonRenderHook item) {
-            if (item.onThirdPersonRender(this.getParentModel(), entity, itemStack, context, arm, poseStack, renderBuffer, light)) {
-                ci.cancel();
-            }
+        if (ThirdPersonPoses.onRender(this.getParentModel(), entity, itemStack, context, arm, poseStack, renderBuffer, light)) {
+            ci.cancel();
         }
-
     }
 }
